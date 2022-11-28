@@ -5,6 +5,7 @@ import genresRouter from './api/genres';
 import './db';
 import './seedData'
 import usersRouter from './api/users';
+import passport from './authenticate';
 dotenv.config();
 
 const app = express();
@@ -20,6 +21,8 @@ const errHandler = (err, req, res, next) => {
     res.status(500).send(`Hey!! You caught the error 👍👍. Here's the details: ${err.stack} `);
   };
 
+app.use(passport.initialize()); 
+  
 app.use(express.static('public'));
 
 app.use('/api/users', usersRouter);
@@ -29,6 +32,8 @@ app.use('/api/movies', moviesRouter);
 app.use('/api/genres', genresRouter);
 
 app.use(errHandler);
+
+app.use('/api/movies', passport.authenticate('jwt', {session: false}), moviesRouter);
 
 app.listen(port, () => {
   console.info(`Server running at ${port}`);
