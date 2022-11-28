@@ -28,6 +28,16 @@ async function loadGenres () {
     }
   }
 
+app.use(express.json());
+app.use(session({
+    secret: 'ilikecake',
+    resave: true,
+    saveUninitialized: true
+  }));
+app.listen(port, () => {
+  console.info(`Server running at ${port}`);
+});
+
 if (process.env.SEED_DB) {
   loadUsers();
   loadGenres();
