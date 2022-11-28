@@ -1,5 +1,5 @@
 {
-  "name": "node-lab1",
+  "name": "lab1",
   "version": "1.0.0",
   "description": "node lab 1",
   "main": "index.js",
@@ -19,5 +19,9 @@
   },
   "dependencies": {
     "dotenv": "^16.0.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "node lab 1"
   }
 }
