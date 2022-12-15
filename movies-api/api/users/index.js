@@ -5,6 +5,9 @@ import asyncHandler from 'express-async-handler';
 import jwt from 'jsonwebtoken';
 
 const router = express.Router(); // eslint-disable-line
+const validate = function (value) {
+  return /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{5,}$/.test(value);
+};
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -14,8 +17,13 @@ router.get('/', async (req, res) => {
 
 // register(Create)/Authenticate User
 router.post('/', asyncHandler(async (req, res, next) => {
+  const validatePwd = validate(req.body.password);
   if (!req.body.username || !req.body.password) {
     res.status(401).json({ success: false, msg: 'Please pass username and password.' });
+    return next();
+  }
+  if (!validatePwd) {
+    res.status(401).json({ success: false, msg: 'Password format is not valid.' });
     return next();
   }
   if (req.query.action === 'register') {
@@ -56,9 +64,13 @@ router.post('/:userName/favourites', asyncHandler(async (req, res) => {
   const userName = req.params.userName;
   const movie = await movieModel.findByMovieDBId(newFavourite);
   const user = await User.findByUserName(userName);
-  await user.favourites.push(movie._id);
-  await user.save();
-  res.status(201).json(user);
+  if (!user.favourites.includes(movie._id)) {
+    await user.favourites.push(movie._id);
+    await user.save();
+    res.status(201).json(user);
+  } else {
+    res.status(401).json({ success: false, msg: 'Movie added is duplicated' });
+  }
 }));
 
 // Find favourites
